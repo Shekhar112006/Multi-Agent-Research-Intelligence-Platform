@@ -6,7 +6,7 @@ registration and authentication.
 """
 
 from sqlalchemy.orm import Session
-
+from app.core.exceptions.auth import EmailAlreadyExistsError
 from app.core.security.password import hash_password
 from app.modules.users.models.users import User
 from app.modules.users.repositories.user_repository import UserRepository
@@ -40,7 +40,7 @@ class AuthService:
         )
 
         if existing_user is not None:
-            raise ValueError("Email already registered.")
+            raise EmailAlreadyExistsError()
 
         hashed_password = hash_password(
             user_data.password.get_secret_value()
