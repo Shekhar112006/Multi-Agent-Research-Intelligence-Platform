@@ -1,18 +1,14 @@
 """
-Schema for user login.
+User login request schema.
 """
 
-from pydantic import BaseModel, ConfigDict, EmailStr, SecretStr
+from pydantic import BaseModel, EmailStr, SecretStr
 
 
 class UserLogin(BaseModel):
     """
-    Login request schema.
+    User login payload.
     """
 
     email: EmailStr
     password: SecretStr
-
-    model_config = ConfigDict(
-        str_strip_whitespace=True,
-    )

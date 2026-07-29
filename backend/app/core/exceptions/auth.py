@@ -11,3 +11,11 @@ class EmailAlreadyExistsError(Exception):
 
     def __init__(self):
         super().__init__("Email already registered.")
+
+class InvalidCredentialsError(Exception):
+    """
+    Raised when login credentials are invalid.
+    """
+
+    def __init__(self):
+        super().__init__("Invalid email or password.")
