@@ -8,6 +8,11 @@ from app.core.exceptions.auth import (
     EmailAlreadyExistsError,
     InvalidCredentialsError,
 )
+from app.core.exceptions.auth import (
+    AuthenticationError,
+    EmailAlreadyExistsError,
+    InvalidCredentialsError,
+)
 from app.core.exceptions.auth import EmailAlreadyExistsError
 
 
@@ -32,6 +37,18 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def invalid_credentials_handler(
         request: Request,
         exc: InvalidCredentialsError,
+    ):
+        return JSONResponse(
+            status_code=401,
+            content={
+                "detail": str(exc),
+            },
+        )
+
+    @app.exception_handler(AuthenticationError)
+    async def authentication_handler(
+        request: Request,
+        exc: AuthenticationError,
     ):
         return JSONResponse(
             status_code=401,

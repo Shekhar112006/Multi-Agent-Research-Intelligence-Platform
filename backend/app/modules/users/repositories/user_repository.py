@@ -4,7 +4,7 @@ Repository for user database operations.
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
+from uuid import UUID
 from app.modules.users.models.users import User
 from app.modules.users.schemas.user_create import UserCreate
 
@@ -26,6 +26,22 @@ class UserRepository:
         """
 
         statement = select(User).where(User.email == email)
+
+        result = self.db.execute(statement)
+
+        return result.scalar_one_or_none()
+
+    def get_by_id(
+        self,
+        user_id: UUID,
+    ) -> User | None:
+        """
+        Retrieve a user by ID.
+        """
+
+        statement = select(User).where(
+            User.id == user_id
+        )
 
         result = self.db.execute(statement)
 
