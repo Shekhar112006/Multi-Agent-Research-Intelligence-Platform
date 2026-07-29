@@ -3,7 +3,7 @@ Application entry point.
 
 Creates and configures the FastAPI application.
 """
-
+from app.api import api_router
 from fastapi import FastAPI
 
 from app.api import api_router

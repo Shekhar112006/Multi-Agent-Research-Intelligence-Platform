@@ -14,3 +14,5 @@ class Base(DeclarativeBase):
     """
 
     pass
+
+from app.modules.users.models.users import User
