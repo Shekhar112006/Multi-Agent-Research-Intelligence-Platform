@@ -7,6 +7,7 @@ to the users table in PostgreSQL.
 
 from datetime import datetime
 from uuid import UUID, uuid4
+from sqlalchemy.orm import relationship
 
 from sqlalchemy import Boolean, DateTime, String
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
@@ -15,7 +16,10 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database.base import Base
 from app.modules.users.models.enums import UserRole
 
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from app.modules.projects.models.project import Project
 """
 User database model.
 
@@ -34,7 +38,10 @@ from app.core.database.base import Base
 from app.modules.users.models.enums import UserRole
 
 
-class User(Base):
+from app.core.database.mixins.timestamp import TimestampMixin
+
+
+class User(TimestampMixin, Base):
     """
     User database model.
 
@@ -83,15 +90,7 @@ class User(Base):
         nullable=False,
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        nullable=False,
-    )
-
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
-        nullable=False,
-    )
+    projects: Mapped[list["Project"]] = relationship(
+    back_populates="owner",
+    cascade="all, delete-orphan",
+)

@@ -15,4 +15,7 @@ class Base(DeclarativeBase):
 
     pass
 
+
+# Import models ONLY AFTER Base exists.
 from app.modules.users.models.users import User
+from app.modules.projects.models.project import Project
