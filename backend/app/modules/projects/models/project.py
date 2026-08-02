@@ -11,6 +11,12 @@ from app.core.database.base import Base
 from app.modules.projects.models.project_status import ProjectStatus
 from typing import TYPE_CHECKING
 
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.modules.papers.models.paper import Paper
+
 if TYPE_CHECKING:
     from app.modules.users.models.users import User
 
@@ -54,4 +60,9 @@ class Project(TimestampMixin,Base):
 
     owner: Mapped["User"] = relationship(
     back_populates="projects",
+)
+
+    papers: Mapped[list["Paper"]] = relationship(
+    back_populates="project",
+    cascade="all, delete-orphan",
 )

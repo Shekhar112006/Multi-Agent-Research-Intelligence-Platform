@@ -42,21 +42,6 @@ class ProjectRepository:
 
         return project
 
-    def get_by_id(
-        self,
-        project_id: UUID,
-    ) -> Project | None:
-        """
-        Retrieve a project by ID.
-        """
-
-        statement = select(Project).where(
-            Project.id == project_id
-        )
-
-        result = self.db.execute(statement)
-
-        return result.scalar_one_or_none()
 
     def list_by_owner(
         self,
@@ -107,3 +92,19 @@ class ProjectRepository:
 
         self.db.delete(project)
         self.db.commit()
+
+    def get_by_id(
+        self,
+        project_id: UUID,
+    ) -> Project | None:
+        """
+        Retrieve a project by ID.
+        """
+
+        statement = select(Project).where(
+            Project.id == project_id
+        )
+
+        result = self.db.execute(statement)
+
+        return result.scalar_one_or_none()
