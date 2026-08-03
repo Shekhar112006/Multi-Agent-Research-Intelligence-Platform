@@ -14,6 +14,9 @@ from app.modules.papers.models.paper import Paper
 from app.modules.papers.models.upload_status import UploadStatus
 from app.modules.papers.repositories.paper_repository import PaperRepository
 from app.modules.projects.repositories.project_repository import ProjectRepository
+from app.modules.processing.document_processing_service import (
+    DocumentProcessingService,
+)
 
 
 class PaperService:
@@ -26,6 +29,7 @@ class PaperService:
         self.repository = PaperRepository(db)
         self.project_repository = ProjectRepository(db)
         self.storage = StorageService()
+        self.processing_service = DocumentProcessingService(db)
 
     async def upload(
         self,
@@ -60,4 +64,10 @@ class PaperService:
             upload_status=UploadStatus.UPLOADED,
         )
 
-        return self.repository.create(paper)
+        paper = self.repository.create(paper)
+
+        self.processing_service.process(
+            paper,
+        )
+
+        return paper
