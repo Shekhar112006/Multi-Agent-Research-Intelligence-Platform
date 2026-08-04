@@ -22,6 +22,7 @@ class DocumentProcessingService:
         self.db = db
         self.paper_content_service = PaperContentService(db)
         self.chunk_service = ChunkService(db)
+        print(">>> DocumentProcessingService.process()")
 
     def process(
         self,
@@ -34,23 +35,18 @@ class DocumentProcessingService:
         paper.upload_status = UploadStatus.PROCESSING
         self.db.commit()
 
-        try:
-            # Extract full text
-            content = self.paper_content_service.extract_and_store(
-                paper,
-            )
+        # Extract and store text
+        content = self.paper_content_service.extract_and_store(
+            paper,
+        )
+        print(f">>> Content length: {len(content.text)}")
 
-            # Split into chunks
-            self.chunk_service.create_chunks(
-                paper,
-                content.text,
-            )
+        # Create chunks
+        self.chunk_service.create_chunks(
+            paper,
+            content.text,
+        )
+        print(">>> Returned from ChunkService")
 
-            paper.upload_status = UploadStatus.PROCESSED
-
-        except Exception:
-            paper.upload_status = UploadStatus.FAILED
-            raise
-
-        finally:
-            self.db.commit()
+        paper.upload_status = UploadStatus.PROCESSED
+        self.db.commit()
