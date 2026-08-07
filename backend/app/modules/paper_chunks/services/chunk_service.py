@@ -23,7 +23,7 @@ class ChunkService:
         self,
         paper,
         text: str,
-    ) -> None:
+    ) -> list[PaperChunk]:
         print(">>> ChunkService started")
 
         chunk_texts = self.splitter.split(text)
@@ -47,3 +47,5 @@ class ChunkService:
         self.repository.create_many(chunks)
 
         print(">>> repository.create_many finished")
+
+        return chunks

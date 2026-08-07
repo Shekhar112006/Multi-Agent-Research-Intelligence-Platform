@@ -18,10 +18,12 @@ class PaperChunkRepository:
     def create_many(
         self,
         chunks: list[PaperChunk],
-    ) -> None:
+    ) -> list[PaperChunk]:
         print(f">>> Repository received {len(chunks)} chunks")
 
         self.db.add_all(chunks)
         self.db.commit()
 
         print(">>> Commit complete")
+
+        return chunks

@@ -10,6 +10,11 @@ from app.modules.paper_contents.services.paper_content_service import (
 from app.modules.paper_chunks.services.chunk_service import (
     ChunkService,
 )
+
+from app.modules.embeddings.services.indexing_service import (
+    IndexingService,
+)
+
 from app.modules.papers.models.upload_status import UploadStatus
 
 
@@ -22,6 +27,7 @@ class DocumentProcessingService:
         self.db = db
         self.paper_content_service = PaperContentService(db)
         self.chunk_service = ChunkService(db)
+        self.indexing_service = IndexingService()
 
     def process(
         self,
@@ -41,11 +47,17 @@ class DocumentProcessingService:
             )
 
             # Split into chunks
-            self.chunk_service.create_chunks(
+            chunks = self.chunk_service.create_chunks(
                 paper,
                 content.text,
             )
 
+            # Index into Qdrant
+            self.indexing_service.index_chunks(
+                chunks,
+            )
+
+            # Mark as processed
             paper.upload_status = UploadStatus.PROCESSED
 
         except Exception:
