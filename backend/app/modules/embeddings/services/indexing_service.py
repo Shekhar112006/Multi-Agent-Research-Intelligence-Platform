@@ -41,10 +41,11 @@ class IndexingService:
                     "id": str(chunk.id),
                     "vector": embedding,
                     "payload": {
+                        "project_id": str(chunk.paper.project_id),
                         "paper_id": str(chunk.paper_id),
                         "chunk_index": chunk.chunk_index,
                         "text": chunk.text,
-                    },
+                    },  
                 }
             )
         print(f">>> Sending {len(points)} vectors to Qdrant")

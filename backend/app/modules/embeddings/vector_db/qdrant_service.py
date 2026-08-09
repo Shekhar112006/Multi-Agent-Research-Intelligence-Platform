@@ -60,3 +60,38 @@ class QdrantService:
                 for point in points
             ],
         )
+
+    def search(
+        self,
+        vector: list[float],
+        limit: int = 5,
+        project_id: str | None = None,
+    ):
+        """
+        Search for the most similar chunks.
+
+        If project_id is provided, only chunks
+        belonging to that project are searched.
+        """
+
+        query_filter = None
+
+        if project_id:
+            query_filter = {
+                "must": [
+                    {
+                        "key": "project_id",
+                        "match": {
+                            "value": project_id,
+                        },
+                    }
+                ]
+            }
+
+        return self.client.query_points(
+            collection_name="paper_chunks",
+            query=vector,
+            query_filter=query_filter,
+            limit=limit,
+            with_payload=True,
+        ).points
