@@ -1,10 +1,7 @@
-from app.modules.retrieval.services.context_builder import ContextBuilder
 from app.modules.retrieval.services.retrieval_service import RetrievalService
 
 
 retrieval_service = RetrievalService()
-context_builder = ContextBuilder()
-
 
 query = "What is the purpose of meditation?"
 
@@ -18,8 +15,13 @@ results = retrieval_service.search(
 )
 
 
-context = context_builder.build(results)
+print(f"\nFound {len(results)} results\n")
 
 
-print("\n===== GENERATED CONTEXT =====\n")
-print(context)
+for result in results:
+    print("Score:", result.score)
+    print("Project:", result.project_id)
+    print("Paper:", result.paper_id)
+    print("Chunk:", result.chunk_index)
+    print("Text:", result.text[:300])
+    print("-" * 80)

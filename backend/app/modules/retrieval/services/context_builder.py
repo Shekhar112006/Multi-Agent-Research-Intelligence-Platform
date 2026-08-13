@@ -1,30 +1,31 @@
 """
-Builds context from retrieved paper chunks.
+Builds LLM-ready context from retrieved chunks.
 """
+
+from app.modules.retrieval.schemas.retrieval_result import RetrievalResult
 
 
 class ContextBuilder:
     """
-    Converts retrieved chunks into LLM-ready context.
+    Converts retrieved chunks into a single context string
+    suitable for an LLM prompt.
     """
 
-    def build(self, results) -> str:
-        """
-        Build a context string from Qdrant search results.
-        """
+    def build(
+        self,
+        results: list[RetrievalResult],
+    ) -> str:
 
         context_parts = []
 
         for result in results:
-            payload = result.payload
-
             context_parts.append(
                 f"""
-Paper ID: {payload["paper_id"]}
-Chunk: {payload["chunk_index"]}
+Paper ID: {result.paper_id}
+Chunk: {result.chunk_index}
 
-{payload["text"]}
-"""
+{result.text}
+""".strip()
             )
 
         return "\n\n---\n\n".join(context_parts)
