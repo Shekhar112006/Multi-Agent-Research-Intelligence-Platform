@@ -28,4 +28,5 @@ Chunk: {result.chunk_index}
 """.strip()
             )
 
-        return "\n\n---\n\n".join(context_parts)
+        return "\n\n---\n\n".join
+        (context_parts)
