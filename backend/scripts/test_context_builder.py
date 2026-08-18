@@ -1,25 +1,28 @@
-from app.modules.retrieval.services.context_builder import ContextBuilder
-from app.modules.retrieval.services.retrieval_service import RetrievalService
+from app.modules.rag.services.context_builder import ContextBuilder
+from app.modules.retrieval.schemas.retrieval_result import RetrievalResult
 
 
-retrieval_service = RetrievalService()
-context_builder = ContextBuilder()
+results = [
+    RetrievalResult(
+        paper_id="paper-123",
+        project_id="project-456",
+        chunk_index=10,
+        text="Meditation helps refine and use generated energy.",
+        score=0.91,
+    ),
+    RetrievalResult(
+        paper_id="paper-123",
+        project_id="project-456",
+        chunk_index=11,
+        text="The practice is described as part of internal cultivation.",
+        score=0.84,
+    ),
+]
 
 
-query = "What is the purpose of meditation?"
+builder = ContextBuilder()
 
-project_id = "b51e31e0-9e09-4936-abbf-3ee3054cad6e"
-
-
-results = retrieval_service.search(
-    query=query,
-    project_id=project_id,
-    limit=5,
-)
-
-
-context = context_builder.build(results)
-
+context = builder.build(results)
 
 print("\n===== GENERATED CONTEXT =====\n")
 print(context)

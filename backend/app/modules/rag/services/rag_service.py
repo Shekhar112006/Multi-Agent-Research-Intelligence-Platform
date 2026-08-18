@@ -1,5 +1,6 @@
 from app.modules.retrieval.services.retrieval_service import RetrievalService
 from app.modules.generation.services.generation_service import GenerationService
+from app.modules.rag.services.context_builder import ContextBuilder
 
 
 class RAGService:
@@ -11,6 +12,7 @@ class RAGService:
         self,
         retrieval_service: RetrievalService | None = None,
         generation_service: GenerationService | None = None,
+        context_builder: ContextBuilder | None = None,
     ):
         self.retrieval_service = (
             retrieval_service or RetrievalService()
@@ -18,6 +20,10 @@ class RAGService:
 
         self.generation_service = (
             generation_service or GenerationService()
+        )
+
+        self.context_builder = (
+            context_builder or ContextBuilder()
         )
 
     def answer(
@@ -34,23 +40,10 @@ class RAGService:
             project_id=project_id,
         )
 
-        # 2. Build context from retrieved chunks
-        context_parts = []
+        # 2. Build LLM context
+        context = self.context_builder.build(results)
 
-        for result in results:
-            context_parts.append(
-                f"""
-Paper ID: {result.paper_id}
-Project ID: {result.project_id}
-Chunk: {result.chunk_index}
-
-{result.text}
-"""
-            )
-
-        context = "\n\n".join(context_parts)
-
-        # 3. Generate answer using retrieved context
+        # 3. Generate answer
         return self.generation_service.generate(
             question=question,
             context=context,
