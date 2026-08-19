@@ -27,10 +27,11 @@ class RAGService:
         )
 
     def answer(
-        self,
-        question: str,
-        project_id: str | None = None,
-        limit: int = 5,
+    self,
+    question: str,
+    project_id: str | None = None,
+    limit: int = 5,
+    min_score: float | None = 0.40,
     ) -> str:
 
         # 1. Retrieve relevant chunks
@@ -38,6 +39,7 @@ class RAGService:
             query=question,
             limit=limit,
             project_id=project_id,
+            min_score=min_score,
         )
 
         # 2. Build LLM context

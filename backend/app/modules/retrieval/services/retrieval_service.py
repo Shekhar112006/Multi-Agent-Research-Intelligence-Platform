@@ -26,11 +26,12 @@ class RetrievalService:
         self.qdrant_service = QdrantService()
 
     def search(
-        self,
-        query: str,
-        limit: int = 5,
-        project_id: str | None = None,
-    ) -> list[RetrievalResult]:
+    self,
+    query: str,
+    limit: int = 5,
+    project_id: str | None = None,
+    min_score: float | None = None,
+) -> list[RetrievalResult]:
 
         vector = self.embedding_service.embed(query)
 
@@ -39,6 +40,13 @@ class RetrievalService:
             limit=limit,
             project_id=project_id,
         )
+
+        if min_score is not None:
+            results = [
+                result
+                for result in results
+                if result.score >= min_score
+            ]
 
         return [
             RetrievalResult(
