@@ -2,6 +2,8 @@
 Repository for paper database operations.
 """
 
+from uuid import UUID
+
 from sqlalchemy.orm import Session
 
 from app.modules.papers.models.paper import Paper
@@ -25,3 +27,14 @@ class PaperRepository:
         self.db.refresh(paper)
 
         return paper
+
+    def get_by_id(
+        self,
+        paper_id: UUID,
+    ) -> Paper | None:
+
+        return (
+            self.db.query(Paper)
+            .filter(Paper.id == paper_id)
+            .first()
+        )

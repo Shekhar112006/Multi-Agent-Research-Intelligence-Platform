@@ -71,3 +71,10 @@ class PaperService:
         )
 
         return paper
+
+    def get_by_id(
+        self,
+        paper_id: UUID,
+    ) -> Paper | None:
+
+        return self.repository.get_by_id(paper_id)
