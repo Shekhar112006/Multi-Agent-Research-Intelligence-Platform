@@ -12,6 +12,7 @@ from app.core.exceptions.handlers import register_exception_handlers
 from app.core.lifespan.lifespan import lifespan
 from app.modules.papers.routers.paper_router import router as paper_router
 from app.modules.search.routers.search_router import router as search_router
+from app.modules.rag.routers.rag_router import router as rag_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -25,3 +26,4 @@ register_exception_handlers(app)
 app.include_router(api_router)
 app.include_router(paper_router)
 app.include_router(search_router)
+app.include_router(rag_router)
