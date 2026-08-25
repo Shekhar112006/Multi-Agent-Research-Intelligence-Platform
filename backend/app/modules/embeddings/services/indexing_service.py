@@ -2,12 +2,16 @@
 Embedding indexing service.
 """
 
+from app.core.logging.logger import get_logger
 from app.modules.embeddings.services.embedding_service import (
     EmbeddingService,
 )
 from app.modules.embeddings.vector_db.qdrant_service import (
     QdrantService,
 )
+
+
+logger = get_logger(__name__)
 
 
 class IndexingService:
@@ -23,10 +27,14 @@ class IndexingService:
         self,
         chunks,
     ) -> None:
-        print(f">>> Indexing {len(chunks)} chunks")
         """
         Index paper chunks into Qdrant.
         """
+
+        logger.info(
+            "Generating embeddings | chunks=%d",
+            len(chunks),
+        )
 
         points = []
 
@@ -45,10 +53,20 @@ class IndexingService:
                         "paper_id": str(chunk.paper_id),
                         "chunk_index": chunk.chunk_index,
                         "text": chunk.text,
-                    },  
+                    },
                 }
             )
-        print(f">>> Sending {len(points)} vectors to Qdrant")
+
+        logger.info(
+            "Sending vectors to Qdrant | vectors=%d",
+            len(points),
+        )
+
         self.qdrant_service.upsert_chunks(
             points,
+        )
+
+        logger.info(
+            "Vectors indexed successfully | vectors=%d",
+            len(points),
         )

@@ -2,11 +2,15 @@
 Chunk service.
 """
 
+from app.core.logging.logger import get_logger
 from app.modules.paper_chunks.models.paper_chunk import PaperChunk
 from app.modules.paper_chunks.processing.text_splitter import TextSplitter
 from app.modules.paper_chunks.repositories.paper_chunk_repository import (
     PaperChunkRepository,
 )
+
+
+logger = get_logger(__name__)
 
 
 class ChunkService:
@@ -15,7 +19,6 @@ class ChunkService:
     """
 
     def __init__(self, db):
-        print(">>> ChunkService initialized")
         self.repository = PaperChunkRepository(db)
         self.splitter = TextSplitter()
 
@@ -24,28 +27,38 @@ class ChunkService:
         paper,
         text: str,
     ) -> list[PaperChunk]:
-        print(">>> ChunkService started")
+        """
+        Split paper text and persist the resulting chunks.
+        """
+
+        logger.info(
+            "Creating chunks | paper_id=%s",
+            paper.id,
+        )
 
         chunk_texts = self.splitter.split(text)
 
-        print(f">>> chunk_texts type: {type(chunk_texts)}")
-        print(f">>> total chunks: {len(chunk_texts)}")
+        logger.info(
+            "Text split completed | paper_id=%s | chunks=%d",
+            paper.id,
+            len(chunk_texts),
+        )
 
-        chunks = []
-
-        for index, chunk_text in enumerate(chunk_texts):
-            chunks.append(
-                PaperChunk(
-                    paper_id=paper.id,
-                    chunk_index=index,
-                    text=chunk_text,
-                )
+        chunks = [
+            PaperChunk(
+                paper_id=paper.id,
+                chunk_index=index,
+                text=chunk_text,
             )
-
-        print(f">>> built {len(chunks)} PaperChunk objects")
+            for index, chunk_text in enumerate(chunk_texts)
+        ]
 
         self.repository.create_many(chunks)
 
-        print(">>> repository.create_many finished")
+        logger.info(
+            "Chunks persisted | paper_id=%s | chunks=%d",
+            paper.id,
+            len(chunks),
+        )
 
         return chunks

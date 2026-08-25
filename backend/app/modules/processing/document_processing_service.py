@@ -4,18 +4,20 @@ Document processing orchestrator.
 
 from sqlalchemy.orm import Session
 
-from app.modules.paper_contents.services.paper_content_service import (
-    PaperContentService,
+from app.core.logging.logger import get_logger
+from app.modules.embeddings.services.indexing_service import (
+    IndexingService,
 )
 from app.modules.paper_chunks.services.chunk_service import (
     ChunkService,
 )
-
-from app.modules.embeddings.services.indexing_service import (
-    IndexingService,
+from app.modules.paper_contents.services.paper_content_service import (
+    PaperContentService,
 )
-
 from app.modules.papers.models.upload_status import UploadStatus
+
+
+logger = get_logger(__name__)
 
 
 class DocumentProcessingService:
@@ -37,31 +39,66 @@ class DocumentProcessingService:
         Process an uploaded paper.
         """
 
+        logger.info(
+            "Starting document processing | paper_id=%s",
+            paper.id,
+        )
+
         paper.upload_status = UploadStatus.PROCESSING
         self.db.commit()
 
         try:
-            # Extract full text
+            logger.info(
+                "Extracting paper text | paper_id=%s",
+                paper.id,
+            )
+
             content = self.paper_content_service.extract_and_store(
                 paper,
             )
 
-            # Split into chunks
+            logger.info(
+                "Paper text extracted | paper_id=%s | characters=%d",
+                paper.id,
+                len(content.text),
+            )
+
             chunks = self.chunk_service.create_chunks(
                 paper,
                 content.text,
             )
 
-            # Index into Qdrant
+            logger.info(
+                "Paper chunks created | paper_id=%s | chunks=%d",
+                paper.id,
+                len(chunks),
+            )
+
             self.indexing_service.index_chunks(
                 chunks,
             )
 
-            # Mark as processed
+            logger.info(
+                "Paper chunks indexed | paper_id=%s | chunks=%d",
+                paper.id,
+                len(chunks),
+            )
+
             paper.upload_status = UploadStatus.PROCESSED
+
+            logger.info(
+                "Document processing completed | paper_id=%s",
+                paper.id,
+            )
 
         except Exception:
             paper.upload_status = UploadStatus.FAILED
+
+            logger.exception(
+                "Document processing failed | paper_id=%s",
+                paper.id,
+            )
+
             raise
 
         finally:
