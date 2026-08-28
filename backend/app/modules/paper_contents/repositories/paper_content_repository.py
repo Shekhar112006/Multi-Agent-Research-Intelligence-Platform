@@ -45,3 +45,21 @@ class PaperContentRepository:
         result = self.db.execute(statement)
 
         return result.scalar_one_or_none()
+
+    def update(
+        self,
+        content: PaperContent,
+        page_count: int,
+        text: str,
+    ) -> PaperContent:
+        """
+        Update existing paper content.
+        """
+
+        content.page_count = page_count
+        content.text = text
+
+        self.db.commit()
+        self.db.refresh(content)
+
+        return content

@@ -49,6 +49,13 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # ==========================
+    # Redis Configuration
+    # ==========================
+
+    redis_host: str = "localhost"
+    redis_port: int = 6379
+
     
     @property
     def database_url(self) -> str:
@@ -62,6 +69,24 @@ class Settings(BaseSettings):
             f"@{self.db_host}:{self.db_port}"
             f"/{self.db_name}"
         )
+
+    @property
+    def redis_url(self) -> str:
+        """
+        Build the Redis URL.
+        """
+
+        return (
+            f"redis://{self.redis_host}:{self.redis_port}/0"
+        )
+    
+    @property
+    def redis_url(self) -> str:
+        """
+        Build the Redis connection URL.
+        """
+
+        return f"redis://{self.redis_host}:{self.redis_port}/0"
 
 
 @lru_cache

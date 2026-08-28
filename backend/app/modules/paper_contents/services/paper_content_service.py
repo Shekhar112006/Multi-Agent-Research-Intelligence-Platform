@@ -25,12 +25,23 @@ class PaperContentService:
         paper,
     ) -> PaperContent:
         """
-        Extract text from a paper and store it.
+        Extract text from a paper and create or update stored content.
         """
 
         result = self.extractor.extract(
             paper.file_path,
         )
+
+        existing_content = self.repository.get_by_paper_id(
+            paper.id,
+        )
+
+        if existing_content:
+            return self.repository.update(
+                existing_content,
+                page_count=result["pages"],
+                text=result["text"],
+            )
 
         content = PaperContent(
             paper_id=paper.id,

@@ -92,6 +92,8 @@ class DocumentProcessingService:
             )
 
         except Exception:
+            self.db.rollback()
+
             paper.upload_status = UploadStatus.FAILED
 
             logger.exception(
@@ -99,7 +101,6 @@ class DocumentProcessingService:
                 paper.id,
             )
 
-            raise
-
-        finally:
             self.db.commit()
+
+            raise

@@ -7,9 +7,9 @@ services:
     restart: unless-stopped
 
     environment:
-      POSTGRES_USER:mrip
+      POSTGRES_USER: mrip
       POSTGRES_PASSWORD: mrip_password
-      POSTGRES_DB:mrip_db
+      POSTGRES_DB: mrip_db
 
     ports:
       - "5432:5432"
