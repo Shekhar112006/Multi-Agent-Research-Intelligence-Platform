@@ -44,7 +44,7 @@ class RAGService:
         question: str,
         project_id: str | None = None,
         limit: int = 5,
-        min_score: float | None = 0.40,
+        min_score: float | None = 0.20,
     ) -> RAGResponse:
 
         # 1. Retrieve relevant chunks

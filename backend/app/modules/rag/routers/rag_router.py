@@ -41,6 +41,6 @@ def ask_question(
     return service.answer(
         question=request.question,
         project_id=str(project_id),
-        limit=5,
-        min_score=0.40,
+        limit=15,
+        min_score=0.20,
     )

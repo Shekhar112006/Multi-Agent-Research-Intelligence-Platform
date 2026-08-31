@@ -5,7 +5,7 @@ Paper chunk model.
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Integer, Text
+from sqlalchemy import ForeignKey, Integer, Text , UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -22,6 +22,14 @@ class PaperChunk(Base, TimestampMixin):
     """
 
     __tablename__ = "paper_chunks"
+
+    __table_args__ = (
+        UniqueConstraint(
+            "paper_id",
+            "chunk_index",
+            name="uq_paper_chunks_paper_id_chunk_index",
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),

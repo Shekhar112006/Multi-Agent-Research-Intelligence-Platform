@@ -3,7 +3,7 @@ Repository for paper chunk database operations.
 """
 
 from sqlalchemy.orm import Session
-
+from sqlalchemy import select
 from app.modules.paper_chunks.models.paper_chunk import PaperChunk
 
 
@@ -27,3 +27,17 @@ class PaperChunkRepository:
         print(">>> Commit complete")
 
         return chunks
+
+    def get_by_paper_id(
+        self,
+        paper_id,
+    ) -> list[PaperChunk]:
+        statement = select(PaperChunk).where(
+            PaperChunk.paper_id == paper_id
+        ).order_by(
+            PaperChunk.chunk_index
+        )
+
+        result = self.db.execute(statement)
+
+        return list(result.scalars().all())

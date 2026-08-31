@@ -36,6 +36,18 @@ class ChunkService:
             paper.id,
         )
 
+        existing_chunks = self.repository.get_by_paper_id(
+            paper.id
+        )
+
+        if existing_chunks:
+            logger.info(
+                "Chunks already exist | paper_id=%s | chunks=%d",
+                paper.id,
+                len(existing_chunks),
+            )
+            return existing_chunks
+
         chunk_texts = self.splitter.split(text)
 
         logger.info(
