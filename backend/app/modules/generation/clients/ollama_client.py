@@ -30,8 +30,9 @@ class OllamaClient:
                     }
                 ],
                 "stream": False,
+                "format": "json",
             },
-            timeout=120,
+            timeout=300,
         )
 
         response.raise_for_status()

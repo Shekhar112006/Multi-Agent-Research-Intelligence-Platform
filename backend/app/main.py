@@ -14,6 +14,7 @@ from app.modules.papers.routers.paper_router import router as paper_router
 from app.modules.search.routers.search_router import router as search_router
 from app.modules.rag.routers.rag_router import router as rag_router
 from app.modules.summarization.routers import router as summarization_router
+from app.modules.claims.routers import router as claims_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -29,3 +30,4 @@ app.include_router(paper_router)
 app.include_router(search_router)
 app.include_router(rag_router)
 app.include_router(summarization_router)
+app.include_router(claims_router)
