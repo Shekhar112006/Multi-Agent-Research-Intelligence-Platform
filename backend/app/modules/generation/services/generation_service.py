@@ -13,6 +13,7 @@ class GenerationService:
         self,
         question: str,
         context: str,
+        response_format: dict | str | None = "json",
     ) -> str:
         """
         Generate an answer using only the supplied context.
@@ -40,4 +41,4 @@ Question:
 Answer:
 """
 
-        return self.ollama_client.generate(prompt)
+        return self.ollama_client.generate(prompt, response_format=response_format)

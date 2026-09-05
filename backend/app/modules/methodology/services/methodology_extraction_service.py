@@ -65,9 +65,43 @@ PAPER TEXT:
 
 {text}
 """
+        methodology_schema = {
+    "type": "object",
+    "properties": {
+        "research_type": {"type": "string"},
+        "research_design": {"type": "string"},
+        "participants": {"type": "string"},
+        "sample_size": {"type": "string"},
+        "data_collection": {"type": "string"},
+        "tools_instruments": {"type": "string"},
+        "analysis_method": {"type": "string"},
+        "evaluation_metrics": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+        "limitations": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
+    },
+    "required": [
+        "research_type",
+        "research_design",
+        "participants",
+        "sample_size",
+        "data_collection",
+        "tools_instruments",
+        "analysis_method",
+        "evaluation_metrics",
+        "limitations",
+    ],
+}
 
-        response = self.generation_service.generate(prompt, text).strip()
-
+        response = self.generation_service.generate(
+            prompt,
+            text,
+            response_format=methodology_schema,
+        ).strip()
         if response.startswith("```"):
             response = response.replace("```json", "")
             response = response.replace("```", "")

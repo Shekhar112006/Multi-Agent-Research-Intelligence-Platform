@@ -35,6 +35,25 @@ class ClaimExtractionService:
 
         all_claims = []
 
+        claims_schema = {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "claim": {"type": "string"},
+                        "evidence": {"type": "string"},
+                        "type": {"type": "string"},
+                        "importance": {"type": "string"},
+                    },
+                    "required": [
+                        "claim",
+                        "evidence",
+                        "type",
+                        "importance",
+                    ],
+                },
+            }
+
         for i in range(0, len(chunks), batch_size):
 
             batch = chunks[i:i + batch_size]
@@ -84,6 +103,7 @@ Paper section:
             response = self.generation_service.generate(
                 prompt,
                 text,
+                response_format=claims_schema,
             ).strip()
 
             # Remove Markdown fences if the model adds them.
