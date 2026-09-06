@@ -16,6 +16,7 @@ from app.modules.rag.routers.rag_router import router as rag_router
 from app.modules.summarization.routers import router as summarization_router
 from app.modules.claims.routers import router as claims_router
 from app.modules.methodology.routers import router as methodology_router
+from app.modules.gaps.routers import router as gaps_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -33,3 +34,4 @@ app.include_router(rag_router)
 app.include_router(summarization_router)
 app.include_router(claims_router)
 app.include_router(methodology_router)
+app.include_router(gaps_router)
