@@ -7,7 +7,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Enum, ForeignKey, Integer, String
+from sqlalchemy import Enum, ForeignKey, Integer, String , Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database.mixins.timestamp import TimestampMixin
@@ -46,6 +46,43 @@ class Paper(TimestampMixin , Base):
     title: Mapped[str] = mapped_column(
         String(255),
         nullable=False,
+    )
+
+    semantic_scholar_id: Mapped[str | None] = mapped_column(
+        String(100),
+        unique=True,
+        nullable=True,
+    )
+
+    abstract: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    authors: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True,
+    )
+
+    publication_year: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+    )
+
+    citation_count: Mapped[int] = mapped_column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    source_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
+    )
+
+    pdf_url: Mapped[str | None] = mapped_column(
+        String(500),
+        nullable=True,
     )
 
     original_filename: Mapped[str] = mapped_column(
