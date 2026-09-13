@@ -17,6 +17,9 @@ from app.modules.research_discovery.services.paper_download_service import (
 from app.modules.research_discovery.services.paper_persistence_service import (
     PaperPersistenceService,
 )
+from app.modules.research_discovery.services.paper_ingestion_service import (
+    PaperIngestionService,
+)
 
 
 router = APIRouter(
@@ -79,47 +82,14 @@ async def download_research_paper(
 async def ingest_research_paper(
     paper_id: str,
     project_id: str,
-    title: str,
-    abstract: str | None = None,
-    pdf_url: str | None = None,
     db=Depends(get_db),
 ):
-    if not pdf_url:
-        raise HTTPException(
-            status_code=400,
-            detail="Open Access PDF URL is required",
-        )
-
     try:
-        download_service = PaperDownloadService()
+        service = PaperIngestionService(db)
 
-        file_path = download_service.download_pdf(
-            pdf_url=pdf_url,
-            paper_id=paper_id,
-        )
-
-        file_size = Path(file_path).stat().st_size
-
-        paper_data = {
-            "paperId": paper_id,
-            "title": title,
-            "abstract": abstract,
-            "authors": [],
-            "year": None,
-            "citationCount": 0,
-            "url": None,
-            "openAccessPdf": {
-                "url": pdf_url,
-            },
-        }
-
-        persistence_service = PaperPersistenceService(db)
-
-        paper = persistence_service.create_paper(
+        paper = service.ingest_paper(
             project_id=project_id,
-            paper_data=paper_data,
-            file_path=file_path,
-            file_size=file_size,
+            paper_id=paper_id,
         )
 
         return {
@@ -131,6 +101,12 @@ async def ingest_research_paper(
             "file_size": paper.file_size,
             "upload_status": paper.upload_status,
         }
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        )
 
     except Exception as exc:
         raise HTTPException(

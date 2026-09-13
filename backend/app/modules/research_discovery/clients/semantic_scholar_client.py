@@ -55,3 +55,25 @@ class SemanticScholarClient:
         response.raise_for_status()
 
         return []
+    
+    def get_paper(self, paper_id: str) -> dict:
+        headers = {}
+
+        if self.api_key:
+            headers["x-api-key"] = self.api_key
+
+        response = requests.get(
+            f"{self.base_url}/paper/{paper_id}",
+            params={
+                "fields": (
+                    "paperId,title,abstract,authors,year,"
+                    "citationCount,url,openAccessPdf"
+                ),
+            },
+            headers=headers,
+            timeout=30,
+        )
+
+        response.raise_for_status()
+
+        return response.json()

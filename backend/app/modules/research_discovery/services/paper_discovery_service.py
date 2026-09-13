@@ -4,10 +4,7 @@ from app.modules.research_discovery.clients.semantic_scholar_client import (
 
 
 class PaperDiscoveryService:
-    def __init__(
-        self,
-        client: SemanticScholarClient | None = None,
-    ):
+    def __init__(self, client: SemanticScholarClient | None = None):
         self.client = client or SemanticScholarClient()
 
     def search_papers(
@@ -18,4 +15,9 @@ class PaperDiscoveryService:
         return self.client.search_papers(
             query=query,
             limit=limit,
+        )
+
+    def get_paper(self, paper_id: str) -> dict:
+        return self.client.get_paper(
+            paper_id=paper_id,
         )
