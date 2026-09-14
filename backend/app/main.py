@@ -8,6 +8,8 @@ from fastapi import FastAPI
 
 from app.api import api_router
 from app.core.config.settings import settings
+import app.core.database.models
+
 from app.core.exceptions.handlers import register_exception_handlers
 from app.core.lifespan.lifespan import lifespan
 from app.modules.papers.routers.paper_router import router as paper_router
@@ -18,6 +20,7 @@ from app.modules.claims.routers import router as claims_router
 from app.modules.methodology.routers import router as methodology_router
 from app.modules.gaps.routers import router as gaps_router
 from app.modules.research_discovery.routers import router as research_discovery_router
+
 
 app = FastAPI(
     title=settings.app_name,

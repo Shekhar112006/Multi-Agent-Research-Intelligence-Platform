@@ -11,6 +11,9 @@ from app.modules.research_discovery.services.paper_download_service import (
 from app.modules.research_discovery.services.paper_persistence_service import (
     PaperPersistenceService,
 )
+from app.modules.paper_contents.services.paper_content_service import (
+    PaperContentService,
+)
 
 
 class PaperIngestionService:
@@ -20,6 +23,7 @@ class PaperIngestionService:
         client: SemanticScholarClient | None = None,
         download_service: PaperDownloadService | None = None,
         persistence_service: PaperPersistenceService | None = None,
+        content_service: PaperContentService | None = None,
     ):
         self.db = db
         self.client = client or SemanticScholarClient()
@@ -28,7 +32,10 @@ class PaperIngestionService:
         )
         self.persistence_service = (
             persistence_service or PaperPersistenceService(db)
-    )
+        )
+        self.content_service = (
+            content_service or PaperContentService(db)
+        )   
 
     def ingest_paper(
         self,
@@ -64,6 +71,10 @@ class PaperIngestionService:
             paper_data=paper_data,
             file_path=file_path,
             file_size=file_size,
+        )
+
+        self.content_service.extract_and_store(
+            paper,
         )
 
         return paper

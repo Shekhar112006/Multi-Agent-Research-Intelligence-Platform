@@ -83,17 +83,26 @@ class FakePersistenceService:
             },
         )()
 
+class FakeContentService:
+    def __init__(self):
+        self.received_paper = None
+
+    def extract_and_store(self, paper):
+        self.received_paper = paper
+
 
 def test_ingest_paper_workflow():
     fake_client = FakeSemanticScholarClient()
     fake_download_service = FakeDownloadService()
     fake_persistence_service = FakePersistenceService()
+    fake_content_service = FakeContentService()
 
     service = PaperIngestionService(
         db=None,
         client=fake_client,
         download_service=fake_download_service,
         persistence_service=fake_persistence_service,
+        content_service=fake_content_service,
     )
 
     paper = service.ingest_paper(
@@ -113,3 +122,5 @@ def test_ingest_paper_workflow():
         fake_persistence_service.received_data["title"]
         == "Test Research Paper"
     )
+
+    assert fake_content_service.received_paper is paper
