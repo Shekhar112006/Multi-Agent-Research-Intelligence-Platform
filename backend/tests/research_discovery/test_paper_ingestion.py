@@ -90,12 +90,56 @@ class FakeContentService:
     def extract_and_store(self, paper):
         self.received_paper = paper
 
+        return type(
+            "FakeContent",
+            (),
+            {
+                "text": "Test chunk content",
+            },
+        )()
+
+class FakeChunkService:
+    def __init__(self):
+        self.received_paper = None
+        self.received_text = None
+
+    def create_chunks(
+        self,
+        paper,
+        text: str,
+    ):
+        self.received_paper = paper
+        self.received_text = text
+
+        return [
+            type(
+                "FakeChunk",
+                (),
+                {
+                    "id": "chunk-1",
+                    "text": "Test chunk content",
+                },
+            )()
+        ]
+
+
+class FakeIndexingService:
+    def __init__(self):
+        self.received_chunks = None
+
+    def index_chunks(
+        self,
+        chunks,
+    ):
+        self.received_chunks = chunks
 
 def test_ingest_paper_workflow():
     fake_client = FakeSemanticScholarClient()
     fake_download_service = FakeDownloadService()
     fake_persistence_service = FakePersistenceService()
     fake_content_service = FakeContentService()
+    fake_chunk_service = FakeChunkService()
+    fake_indexing_service = FakeIndexingService()
 
     service = PaperIngestionService(
         db=None,
@@ -103,6 +147,8 @@ def test_ingest_paper_workflow():
         download_service=fake_download_service,
         persistence_service=fake_persistence_service,
         content_service=fake_content_service,
+        chunk_service=fake_chunk_service,
+        indexing_service=fake_indexing_service,
     )
 
     paper = service.ingest_paper(
@@ -124,3 +170,17 @@ def test_ingest_paper_workflow():
     )
 
     assert fake_content_service.received_paper is paper
+
+    assert fake_chunk_service.received_paper is paper
+
+    assert (
+        fake_chunk_service.received_text
+        == "Test chunk content"
+    )
+
+    assert len(fake_indexing_service.received_chunks) == 1
+
+    assert (
+        fake_indexing_service.received_chunks[0].text
+        == "Test chunk content"
+    )

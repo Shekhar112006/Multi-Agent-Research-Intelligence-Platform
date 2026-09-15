@@ -14,6 +14,12 @@ from app.modules.research_discovery.services.paper_persistence_service import (
 from app.modules.paper_contents.services.paper_content_service import (
     PaperContentService,
 )
+from app.modules.paper_chunks.services.chunk_service import (
+    ChunkService,
+)
+from app.modules.embeddings.services.indexing_service import (
+    IndexingService,
+)
 
 
 class PaperIngestionService:
@@ -24,18 +30,46 @@ class PaperIngestionService:
         download_service: PaperDownloadService | None = None,
         persistence_service: PaperPersistenceService | None = None,
         content_service: PaperContentService | None = None,
+        chunk_service: ChunkService | None = None,
+        indexing_service: IndexingService | None = None,
     ):
         self.db = db
-        self.client = client or SemanticScholarClient()
+
+        self.client = (
+            client
+            if client is not None
+            else SemanticScholarClient()
+        )
+
         self.download_service = (
-            download_service or PaperDownloadService()
+            download_service
+            if download_service is not None
+            else PaperDownloadService()
         )
+
         self.persistence_service = (
-            persistence_service or PaperPersistenceService(db)
+            persistence_service
+            if persistence_service is not None
+            else PaperPersistenceService(db)
         )
+
         self.content_service = (
-            content_service or PaperContentService(db)
-        )   
+            content_service
+            if content_service is not None
+            else PaperContentService(db)
+        )
+
+        self.chunk_service = (
+            chunk_service
+            if chunk_service is not None
+            else ChunkService(db)
+        )
+
+        self.indexing_service = (
+            indexing_service
+            if indexing_service is not None
+            else IndexingService()
+        )
 
     def ingest_paper(
         self,
@@ -73,8 +107,17 @@ class PaperIngestionService:
             file_size=file_size,
         )
 
-        self.content_service.extract_and_store(
+        content = self.content_service.extract_and_store(
             paper,
+        )
+
+        chunks = self.chunk_service.create_chunks(
+            paper=paper,
+            text=content.text,
+        )
+
+        self.indexing_service.index_chunks(
+            chunks,
         )
 
         return paper
