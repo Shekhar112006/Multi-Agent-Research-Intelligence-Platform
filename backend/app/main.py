@@ -20,6 +20,9 @@ from app.modules.claims.routers import router as claims_router
 from app.modules.methodology.routers import router as methodology_router
 from app.modules.gaps.routers import router as gaps_router
 from app.modules.research_discovery.routers import router as research_discovery_router
+from app.modules.comparison.routers import (
+    router as comparison_router,
+)
 
 
 app = FastAPI(
@@ -40,3 +43,4 @@ app.include_router(claims_router)
 app.include_router(methodology_router)
 app.include_router(gaps_router)
 app.include_router(research_discovery_router)
+app.include_router(comparison_router)

@@ -38,3 +38,14 @@ class PaperRepository:
             .filter(Paper.id == paper_id)
             .first()
         )
+
+    def get_by_ids(
+        self,
+        paper_ids: list[UUID],
+    ) -> list[Paper]:
+
+        return (
+            self.db.query(Paper)
+            .filter(Paper.id.in_(paper_ids))
+            .all()
+        )
