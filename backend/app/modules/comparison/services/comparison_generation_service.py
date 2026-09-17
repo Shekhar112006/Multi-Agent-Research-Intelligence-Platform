@@ -35,17 +35,22 @@ class ComparisonGenerationService:
         context_parts = []
 
         for paper in comparison_data:
+            chunk_text = "\n\n".join(
+                chunk["text"]
+                for chunk in paper["chunks"]
+            )
+
             context_parts.append(
                 f"""
-PAPER ID:
-{paper["paper_id"]}
+        PAPER ID:
+        {paper["paper_id"]}
 
-TITLE:
-{paper["title"]}
+        TITLE:
+        {paper["title"]}
 
-CONTENT:
-{paper["text"]}
-"""
+        CONTENT:
+        {chunk_text}
+        """
             )
 
         context = "\n".join(context_parts)

@@ -13,10 +13,10 @@ PROJECT_ID = UUID(
 
 PAPER_IDS = [
     UUID(
-        "cc5c735a-0c5f-4659-aeed-50751593d921"
+        "1fdf8b05-35f5-47a6-bc3b-3eec4d1be288"
     ),
     UUID(
-        "7485cbfa-66f3-452f-b8aa-8c830911b88b"
+        "f5856354-a43e-46fb-8e1f-fa11f94b000b"
     ),
 ]
 

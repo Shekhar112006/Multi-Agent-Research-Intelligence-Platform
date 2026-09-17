@@ -66,6 +66,7 @@ class QdrantService:
         vector: list[float],
         limit: int = 5,
         project_id: str | None = None,
+        paper_id: str | None = None,
     ):
         """
         Search for the most similar chunks.
@@ -77,16 +78,34 @@ class QdrantService:
         query_filter = None
 
         if project_id:
-            query_filter = {
-                "must": [
+            query_filter = None
+
+            must_conditions = []
+
+            if project_id:
+                must_conditions.append(
                     {
                         "key": "project_id",
                         "match": {
                             "value": project_id,
                         },
                     }
-                ]
-            }
+                )
+
+            if paper_id:
+                must_conditions.append(
+                    {
+                        "key": "paper_id",
+                        "match": {
+                            "value": paper_id,
+                        },
+                    }
+                )
+
+            if must_conditions:
+                query_filter = {
+                    "must": must_conditions,
+                }
 
         return self.client.query_points(
             collection_name="paper_chunks",

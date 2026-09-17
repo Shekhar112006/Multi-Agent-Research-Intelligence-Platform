@@ -15,6 +15,9 @@ from app.modules.paper_contents.repositories.paper_content_repository import (
 from app.modules.comparison.services.comparison_generation_service import (
     ComparisonGenerationService,
 )
+from app.modules.paper_chunks.repositories.paper_chunk_repository import (
+    PaperChunkRepository,
+)
 
 
 class ComparisonService:
@@ -25,6 +28,7 @@ class ComparisonService:
     def __init__(self, db: Session):
         self.repository = PaperRepository(db)
         self.content_repository = PaperContentRepository(db)
+        self.chunk_repository = PaperChunkRepository(db)
         self.generation_service = ComparisonGenerationService()
 
     def get_papers_for_comparison(
@@ -88,10 +92,6 @@ class ComparisonService:
         project_id: UUID,
         paper_ids: list[UUID],
     ) -> list[dict]:
-        """
-        Build comparison input using the actual paper content.
-        """
-
         papers = self.get_papers_for_comparison(
             project_id=project_id,
             paper_ids=paper_ids,
@@ -100,20 +100,26 @@ class ComparisonService:
         comparison_data = []
 
         for paper in papers:
-            content = self.content_repository.get_by_paper_id(
+            chunks = self.chunk_repository.get_by_paper_id(
                 paper.id,
             )
 
-            if content is None:
+            if not chunks:
                 raise ValueError(
-                    f"Paper content not found for paper: {paper.id}"
+                    f"Paper chunks not found for paper: {paper.id}"
                 )
 
             comparison_data.append(
                 {
                     "paper_id": str(paper.id),
                     "title": paper.title,
-                    "text": content.text,
+                    "chunks": [
+                        {
+                            "chunk_index": chunk.chunk_index,
+                            "text": chunk.text,
+                        }
+                        for chunk in chunks[:6]
+                    ],
                 }
             )
 
