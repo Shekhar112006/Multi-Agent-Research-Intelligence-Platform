@@ -35,10 +35,18 @@ class ComparisonGenerationService:
         context_parts = []
 
         for paper in comparison_data:
-            chunk_text = "\n\n".join(
-                chunk["text"]
-                for chunk in paper["chunks"]
-            )
+            comparison_context = paper["comparison_context"]
+
+            def format_chunks(chunks: list[dict]) -> str:
+                unique_chunks = {}
+
+                for chunk in chunks:
+                    unique_chunks[chunk["chunk_index"]] = chunk["text"]
+
+                return "\n\n".join(
+                    f"Chunk {chunk_index}:\n{text}"
+                    for chunk_index, text in unique_chunks.items()
+                )
 
             context_parts.append(
                 f"""
@@ -48,8 +56,23 @@ class ComparisonGenerationService:
         TITLE:
         {paper["title"]}
 
-        CONTENT:
-        {chunk_text}
+        METHODOLOGY:
+        {format_chunks(comparison_context["methodology"])}
+
+        DATASETS:
+        {format_chunks(comparison_context["datasets"])}
+
+        EVALUATION METRICS:
+        {format_chunks(comparison_context["evaluation_metrics"])}
+
+        RESULTS:
+        {format_chunks(comparison_context["results"])}
+
+        LIMITATIONS:
+        {format_chunks(comparison_context["limitations"])}
+
+        CLAIMS:
+        {format_chunks(comparison_context["claims"])}
         """
             )
 
@@ -92,6 +115,7 @@ Rules:
 5. Compare the papers rather than summarizing them independently.
 """
 
+    
         response = self.generation_service.generate(
             question=question,
             context=context,

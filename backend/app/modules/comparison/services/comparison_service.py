@@ -18,6 +18,9 @@ from app.modules.comparison.services.comparison_generation_service import (
 from app.modules.paper_chunks.repositories.paper_chunk_repository import (
     PaperChunkRepository,
 )
+from app.modules.comparison.services.comparison_retrieval_service import (
+    ComparisonRetrievalService,
+)
 
 
 class ComparisonService:
@@ -30,6 +33,7 @@ class ComparisonService:
         self.content_repository = PaperContentRepository(db)
         self.chunk_repository = PaperChunkRepository(db)
         self.generation_service = ComparisonGenerationService()
+        self.retrieval_service = ComparisonRetrievalService()
 
     def get_papers_for_comparison(
         self,
@@ -92,6 +96,10 @@ class ComparisonService:
         project_id: UUID,
         paper_ids: list[UUID],
     ) -> list[dict]:
+        """
+        Build dimension-aware comparison context for selected papers.
+        """
+
         papers = self.get_papers_for_comparison(
             project_id=project_id,
             paper_ids=paper_ids,
@@ -100,31 +108,22 @@ class ComparisonService:
         comparison_data = []
 
         for paper in papers:
-            chunks = self.chunk_repository.get_by_paper_id(
-                paper.id,
+            comparison_context = self.retrieval_service.retrieve_comparison_context(
+                project_id=project_id,
+                paper_id=paper.id,
             )
-
-            if not chunks:
-                raise ValueError(
-                    f"Paper chunks not found for paper: {paper.id}"
-                )
 
             comparison_data.append(
                 {
                     "paper_id": str(paper.id),
                     "title": paper.title,
-                    "chunks": [
-                        {
-                            "chunk_index": chunk.chunk_index,
-                            "text": chunk.text,
-                        }
-                        for chunk in chunks[:6]
-                    ],
+                    "comparison_context": comparison_context,
                 }
             )
 
         return comparison_data
 
+    
     def compare_papers(
         self,
         *,
