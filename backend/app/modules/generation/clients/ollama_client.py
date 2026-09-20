@@ -8,7 +8,7 @@ class OllamaClient:
 
     def __init__(
         self,
-        base_url: str = "http://192.168.56.1:11434",
+        base_url: str = "http://10.0.2.2:11434",
         model: str = "llama3.2:latest",
     ):
         self.base_url = base_url

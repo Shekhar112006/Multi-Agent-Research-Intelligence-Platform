@@ -31,7 +31,7 @@ class ClaimExtractionService:
             raise ValueError("No chunks found for this paper")
 
         # Keep batches small enough for local LLM inference.
-        batch_size = 2
+        batch_size = 6
 
         all_claims = []
 

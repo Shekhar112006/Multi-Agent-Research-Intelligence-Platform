@@ -23,6 +23,9 @@ from app.modules.research_discovery.routers import router as research_discovery_
 from app.modules.comparison.routers import (
     router as comparison_router,
 )
+from app.modules.contradictions.routers import (
+    router as contradiction_router,
+)
 
 
 app = FastAPI(
@@ -44,3 +47,4 @@ app.include_router(methodology_router)
 app.include_router(gaps_router)
 app.include_router(research_discovery_router)
 app.include_router(comparison_router)
+app.include_router(contradiction_router)
