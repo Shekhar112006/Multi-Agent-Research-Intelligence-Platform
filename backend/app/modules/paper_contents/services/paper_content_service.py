@@ -25,12 +25,17 @@ class PaperContentService:
         paper,
     ) -> PaperContent:
         """
-        Extract text from a paper and create or update stored content.
+        Extract text from a paper, sanitize it,
+        and create or update stored content.
         """
 
         result = self.extractor.extract(
             paper.file_path,
         )
+
+        # PostgreSQL TEXT fields cannot contain NUL bytes.
+        # Some PDF extraction libraries may return \x00 characters.
+        text = result["text"].replace("\x00", "")
 
         existing_content = self.repository.get_by_paper_id(
             paper.id,
@@ -40,13 +45,13 @@ class PaperContentService:
             return self.repository.update(
                 existing_content,
                 page_count=result["pages"],
-                text=result["text"],
+                text=text,
             )
 
         content = PaperContent(
             paper_id=paper.id,
             page_count=result["pages"],
-            text=result["text"],
+            text=text,
         )
 
         return self.repository.create(content)
