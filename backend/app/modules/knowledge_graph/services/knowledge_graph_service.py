@@ -1,3 +1,4 @@
+
 """
 Service layer for knowledge graph operations.
 """
@@ -19,6 +20,9 @@ from app.modules.knowledge_graph.repositories.knowledge_edge_repository import (
 )
 from app.modules.knowledge_graph.repositories.knowledge_node_repository import (
     KnowledgeNodeRepository,
+)
+from app.modules.knowledge_graph.schemas.knowledge_extraction import (
+    KnowledgeGraphExtractionResponse,
 )
 
 
@@ -304,3 +308,54 @@ class KnowledgeGraphService:
             source_paper_id=paper_a_id,
             properties=properties,
         )
+
+    def persist_extraction(
+        self,
+        extraction: KnowledgeGraphExtractionResponse,
+        source_paper_id: uuid.UUID | None = None,
+    ) -> tuple[list[KnowledgeNode], list[KnowledgeEdge]]:
+        """
+        Persist an AI-generated knowledge graph extraction.
+
+        Creates or reuses nodes first, then resolves relationship
+        labels to node IDs before creating or reusing edges.
+        """
+
+        node_map: dict[str, KnowledgeNode] = {}
+
+        for extracted_node in extraction.nodes:
+            node = self.get_or_create_node(
+                node_type=extracted_node.node_type,
+                label=extracted_node.label,
+                entity_id=extracted_node.entity_id,
+                properties=extracted_node.properties,
+            )
+
+            node_map[extracted_node.label] = node
+
+        persisted_edges: list[KnowledgeEdge] = []
+
+        for relationship in extraction.relationships:
+            source_node = node_map.get(
+                relationship.source_label
+            )
+            target_node = node_map.get(
+                relationship.target_label
+            )
+
+            if source_node is None or target_node is None:
+                continue
+
+            edge = self.get_or_create_edge(
+                source_node_id=source_node.id,
+                target_node_id=target_node.id,
+                relationship_type=relationship.relationship_type,
+                evidence=relationship.evidence,
+                confidence=relationship.confidence,
+                source_paper_id=source_paper_id,
+                properties=relationship.properties,
+            )
+
+            persisted_edges.append(edge)
+
+        return list(node_map.values()), persisted_edges

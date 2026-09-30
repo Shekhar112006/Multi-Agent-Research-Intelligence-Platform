@@ -84,6 +84,25 @@ Allowed relationship types:
 - evaluates_with
 - related_to
 
+IMPORTANT:
+The relationship_type value MUST be exactly one of these strings:
+"uses"
+"studies"
+"supports"
+"contradicts"
+"evaluates_with"
+"related_to"
+
+Do NOT use variations such as:
+- evaluates
+- evaluated_by
+- evaluate
+- assesses
+- tests
+
+If the paper evaluates a method using a dataset or metric,
+use exactly "evaluates_with".
+
 Rules:
 1. Do not invent entities.
 2. Do not invent relationships.
