@@ -4,7 +4,7 @@ Schemas for AI-driven knowledge graph extraction.
 
 import uuid
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.modules.knowledge_graph.models.knowledge_edge import (
     KnowledgeRelationshipType,
@@ -12,6 +12,7 @@ from app.modules.knowledge_graph.models.knowledge_edge import (
 from app.modules.knowledge_graph.models.knowledge_node import (
     KnowledgeNodeType,
 )
+import enum
 
 
 class ExtractedKnowledgeNode(BaseModel):
@@ -40,6 +41,15 @@ class ExtractedKnowledgeNode(BaseModel):
         default_factory=dict,
         description="Additional structured metadata.",
     )
+
+class KnowledgeConfidence(str, enum.Enum):
+    """
+    Supported confidence levels for extracted relationships.
+    """
+
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
 
 
 class ExtractedKnowledgeRelationship(BaseModel):
@@ -72,9 +82,8 @@ class ExtractedKnowledgeRelationship(BaseModel):
         description="Evidence from the research paper.",
     )
 
-    confidence: str = Field(
+    confidence: KnowledgeConfidence = Field(
         ...,
-        max_length=20,
         description="Confidence in the extracted relationship.",
     )
 
@@ -98,3 +107,29 @@ class KnowledgeGraphExtractionResponse(BaseModel):
         default_factory=list,
         description="Knowledge graph relationships extracted from the paper.",
     )
+
+    @model_validator(mode="after")
+    def validate_relationship_endpoints(self):
+        """
+        Ensure every relationship references an extracted node.
+        """
+
+        node_labels = {
+            node.label
+            for node in self.nodes
+        }
+
+        for relationship in self.relationships:
+            if relationship.source_label not in node_labels:
+                raise ValueError(
+                    f"Relationship source node does not exist: "
+                    f"{relationship.source_label}"
+                )
+
+            if relationship.target_label not in node_labels:
+                raise ValueError(
+                    f"Relationship target node does not exist: "
+                    f"{relationship.target_label}"
+                )
+
+        return self

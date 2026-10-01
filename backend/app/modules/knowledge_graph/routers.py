@@ -4,7 +4,7 @@ API routes for knowledge graph operations.
 
 import uuid
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.core.database.session import get_db
@@ -14,7 +14,13 @@ from app.modules.knowledge_graph.schemas import (
     KnowledgeNodeResponse,
 )
 from app.modules.knowledge_graph.services import KnowledgeGraphService
-
+from app.modules.knowledge_graph.services import (
+    KnowledgeContextService,
+    KnowledgeGraphService,
+)
+from app.modules.knowledge_graph.services.knowledge_graph_extraction_service import (
+    KnowledgeGraphExtractionService,
+)
 
 router = APIRouter(
     prefix="/knowledge-graph",
@@ -69,3 +75,47 @@ def create_knowledge_edge(
         source_paper_id=request.source_paper_id,
         properties=request.properties,
     )
+
+@router.post(
+    "/papers/{paper_id}/extract",
+    status_code=status.HTTP_201_CREATED,
+)
+def extract_paper_knowledge_graph(
+    paper_id: uuid.UUID,
+    db: Session = Depends(get_db),
+):
+    """
+    Extract and persist a knowledge graph from a research paper.
+    """
+
+    context_service = KnowledgeContextService(db)
+    extraction_service = KnowledgeGraphExtractionService()
+    graph_service = KnowledgeGraphService(db)
+
+    try:
+        paper_context = context_service.build_paper_context(
+            paper_id=paper_id,
+        )
+
+        extraction = extraction_service.extract(
+            paper_context=paper_context,
+        )
+
+        nodes, edges = graph_service.persist_extraction(
+            extraction=extraction,
+            source_paper_id=paper_id,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    return {
+        "paper_id": paper_id,
+        "nodes_created": len(nodes),
+        "edges_created": len(edges),
+        "nodes": nodes,
+        "edges": edges,
+    }
