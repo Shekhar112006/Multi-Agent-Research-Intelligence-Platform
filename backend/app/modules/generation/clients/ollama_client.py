@@ -22,6 +22,9 @@ class OllamaClient:
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
                 "format": response_format,
+                "options": {
+                    "temperature": 0,
+                },
             },
             timeout=300,
         )
